@@ -1,0 +1,98 @@
+\name{deltaHedge}
+\alias{deltaHedge}
+\title{Dynamic delta hedging}
+\usage{
+  deltaHedge(instruments, env, params, trace = F)
+}
+\arguments{
+  \item{instruments}{list of instruments to be hedged}
+
+  \item{env}{a \code{\linkS4class{DataProvider}}}
+
+  \item{params}{list of parameters that define the hedging
+  policy: \describe{ \item{dtSim [vector of
+  timeDate]}{simulation dates} \item{dtFirst
+  [timeDate]}{first simulation date} \item{dtLast
+  [timeDate]}{last simulation date} \item{nbSteps
+  [numeric]}{number of simulation steps}
+  \item{transaction.cost [numeric]}{proportional
+  transaction cost for the underlying asset} }}
+
+  \item{trace}{output debuging information?}
+}
+\value{
+  a list with the following items: \describe{ \item{wealth
+  [matrix]}{residual wealth by time step and scenario}
+  \item{portfolio [matrix]}{value of hedge portfolio by
+  time step and scenario} \item{bond [matrix]}{quantity of
+  zero-coupon bond held in the hedge portfolio by time step
+  and scenario} \item{price [matrix]}{price of derivative
+  portfolio, by time step and scenario} \item{stock
+  [matrix]}{quantity of underlying asset in the hedge
+  portfolio, by time step and scenario} \item{description
+  [string]}{description of hedging strategy} }
+}
+\description{
+  Delta hedging simulator
+}
+\details{
+  This function simulates a dynamic hedging strategy of a
+  derivative or of a portfolio of derivatives, all function
+  of the same underlying asset.
+}
+\examples{
+library(fInstrument)
+
+dtExpiry <- mytDate('01jan2011')
+dtStart <- mytDate('01jan2010')
+nbSteps <- 100;
+nbPaths <- 500;
+
+dtSim <- timeSequence(dtStart, dtExpiry, length.out=nbSteps+1)
+horizon <- tDiff(dtExpiry, dtStart)
+delta.t <- horizon/nbSteps
+
+sigma <- .3
+
+underlying <- 'IBM'
+K<-100
+# define derivative
+a <- fInstrumentFactory("vanilla", quantity=1,
+                  params=list(cp='c', strike=K,
+                    dtExpiry=dtExpiry,
+                    underlying=underlying,
+                    discountRef='USD.LIBOR', trace=FALSE))
+
+# market data in default environment - basic PV calculation
+
+base.env <- DataProvider()
+setData(base.env, underlying, 'Price', dtStart, 100)
+setData(base.env, underlying, 'DivYield', dtStart, .02)
+setData(base.env, underlying, 'ATMVol', dtStart, sigma)
+setData(base.env, underlying, 'discountRef', dtStart, 'USD.LIBOR')
+setData(base.env, 'USD.LIBOR', 'Yield', dtStart, .02)
+
+getValue(a, 'Price', dtStart, base.env)
+
+# price paths
+tSpot <- pathSimulator(dtSim = dtSim, nbPaths=nbPaths,
+    innovations.gen=sobolInnovations, path.gen=logNormal,
+    path.param = list(mu=0, sigma=sigma), S0=100, antithetic = FALSE,
+    standardization = TRUE, trace = FALSE)
+
+# derived environment for scenario analysis
+sce.env <- DataProvider(parent=base.env)
+setData(sce.env, underlying, 'Price',
+        time(tSpot), as.matrix(tSpot))
+
+# simulate a delta-hedge strategy along each path
+assets = list(a)
+res <- deltaHedge(assets, sce.env,
+                  params=list(dtSim=time(tSpot),
+                  transaction.cost=0), trace=FALSE)
+
+x11()
+hist(tail(res$wealth,1), 50, xlab="wealth",
+     main=paste("distribution of wealth at expiry ", attr(a,'desc')))
+}
+

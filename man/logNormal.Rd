@@ -1,0 +1,24 @@
+\name{logNormal}
+\alias{logNormal}
+\title{Log-normal path generator}
+\usage{
+  logNormal(S0, eps, delta.t, params)
+}
+\arguments{
+  \item{S0}{[numeric] initial value}
+
+  \item{eps}{[numeric] matrix of uniform (0,1) deviates}
+
+  \item{delta.t}{[numeric] time step}
+
+  \item{params}{[list] definition of process: \describe{
+  \item{mu [numeric]}{drift (annual rate)} \item{sigma
+  [numeric]}{standard deviation (annual rate)} }}
+}
+\value{
+  matrix of paths, one path by column
+}
+\description{
+  Log-normal dynamic with constant drift and volatility
+}
+
