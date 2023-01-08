@@ -1,18 +1,12 @@
 Package: DynamicSimulation
-Version: 0.1
+Version: 1.0
 Title: Dymamic Simulation
 Author: P. Henaff
-Depends:
-    fInstrument,
-    timeSeries,
-    Hmisc,
-    xtable,
-    empfin
-Maintainer: P. Henaff <henaff.iae@univ-paris1.fr>
+Depends: fInstrument, timeSeries, Hmisc, xtable, empfin
+Maintainer: P. Henaff <pa.henaff@gmail.com>
 Description: Dynamic simulation
 LazyLoad: yes
 LazyData: yes
 License: GPL (>=2)
-Collate:
-    'DynamicSimulator.r'
-    'PathSimulator.r'
+Collate: 'DynamicSimulator.r' 'PathSimulator.r' 
+RoxygenNote: 7.2.3

@@ -81,7 +81,7 @@
 #'      main=paste("distribution of wealth at expiry ", attr(a,'desc')))
 #' @export
 
-deltaHedge <- function(instruments, env, params, trace=F) {
+deltaHedge <- function(instruments, env, params, trace=FALSE) {
 
   
 dtSim <- params[['dtSim']]
@@ -165,13 +165,10 @@ df <- exp(-iRate*tDiff(dtSim[1], dtSim[nbSteps]))
 tAlpha[1,] <- (tV[1,] - tDelta[1,]*tSpot[1,]) / df
 
 for(i in seq(2, nbSteps)) {
-  TTM <- tDiff(dtSim[i], dtSim[nbSteps])
-  dt <- tDiff(dtSim[i-1], dtSim[i])
   iRate <- getData(env, discountRef, 'Yield', dtSim[i])
-  dYield <- getData(env, Underlying, 'DivYield', dtSim[i])
-  df <- exp(-iRate*TTM)
+  df <- exp(-iRate*tDiff(dtSim[i], dtSim[nbSteps]))
   tSpot[i,] <- getData(env, Underlying, 'Price', dtSim[i])
-  tV[i,] <- as.numeric(tAlpha[i-1,]) * df + as.numeric(tDelta[i-1,]) * (tSpot[i,] + tSpot[i-1,]*(exp(dYield*dt)-1))
+  tV[i,] <- as.numeric(tAlpha[i-1,]) * df + as.numeric(tDelta[i-1,]) * tSpot[i,]
   # reduce portfolio value by transaction cost
   tV[i,] <- tV[i,] - abs(as.numeric(tDelta[i-1,])-as.numeric(tDelta[i,]))*tSpot[i,]*transaction.cost
   tAlpha[i,] <- (tV[i,] - tDelta[i,] * tSpot[i,])/df
@@ -188,22 +185,20 @@ res <- list("wealth"= tV-tPrice, "portfolio"=tV, "bond"=tAlpha, "price"=tPrice, 
 res 
 }
 
-#' Delta hedging simulator
+#' Detailed Report
 #'
-#' This function simulates a dynamic hedging strategy of a derivative
-#' or of a portfolio of derivatives, all function of the same underlying asset.
-#' @title Dynamic delta hedging
+#' Builds a detailed report by time step as an xtable, with 6 columns:
+#' \enumerate{
+#' \item time step
+#' \item stock price
+#' \item delta
+#' \item option value
+#' \item bond position
+#' \item portfolio value
+#' }
+#'
 #' @param iScenario number of scenario to be displayed
 #' @param res result from a dynamic hedging simulation function, such as \code{\link{deltaHedge}}
-#' @return an xtable with 6 columns:
-#' \describe{
-#' \item{time}{time step}
-#' \item{stock price}{the price of the underlying asset}
-#' \item{delta}{the delta of the option}
-#' \item{option}{option value}
-#' \item{bond pos}{zero-coupon bond position}
-#' \item{hedge port.}{net value of hedge portfolio}
-#' }
 #'
 #' @export
 

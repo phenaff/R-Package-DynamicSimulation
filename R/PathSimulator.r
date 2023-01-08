@@ -1,27 +1,10 @@
 #' Random matrix generator
 #'
-#' @title Generator of Random Matrices (Sobol, fixed seed)
-#' @param nbPaths [numeric] number of paths
-#' @param pathLength [numeric] number of steps
-#'
-#' @return a matrix of normal(0,1) random numbers
-#' @export
-
-sobolSeedInnovations <- function(nbPaths, pathLength) {
-     # mcSteps: nb of MC replications
-     # pathLength: nb of time steps
-     innovations = rnorm.sobol(nbPaths*pathLength+1, dimension=1, seed=12345)[-1]
-     dim(innovations) <- c(nbPaths, pathLength)
-     # Return Value:
-     innovations }
-
-#' Random matrix generator
-#'
 #' @title Generator of Random Matrices (Sobol)
 #' @param nbPaths [numeric] number of paths
 #' @param pathLength [numeric] number of steps
 #'
-#' @return a matrix of normal(0,1) random numbers
+#' @return a matrix of uniform (0,1) random numbers
 #' @export
 
 sobolInnovations <- function(nbPaths, pathLength) {
@@ -38,7 +21,7 @@ sobolInnovations <- function(nbPaths, pathLength) {
 #' @param nbPaths [numeric] number of paths
 #' @param pathLength [numeric] number of steps
 #'
-#' @return a matrix of normal(0,1) random numbers
+#' @return a matrix of uniform (0,1) random numbers
 #' @export
 
 rnormInnovations <- function(nbPaths, pathLength) {
