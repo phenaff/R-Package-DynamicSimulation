@@ -5,6 +5,7 @@ Author: P. Henaff
 Depends: fInstrument, timeSeries, Hmisc, xtable, empfin
 Maintainer: P. Henaff <pa.henaff@gmail.com>
 Description: Dynamic simulation
+URL: https://github.com/phenaff/R-Package-DynamicSimulation
 LazyLoad: yes
 LazyData: yes
 License: GPL (>=2)
