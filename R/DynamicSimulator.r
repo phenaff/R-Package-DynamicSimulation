@@ -199,10 +199,10 @@ res
 #'
 #' @param iScenario number of scenario to be displayed
 #' @param res result from a dynamic hedging simulation function, such as \code{\link{deltaHedge}}
-#'
+#' @param dec.digits number of digits to be displayed: one number or an array of length 5.
 #' @export
 
-makeTable <- function(iScenario, res) {
+makeTable <- function(iScenario, res, dec.digits=2) {
 tSpot <- res$spot
 nbSteps <- dim(tSpot)[1]
 z <- matrix(nrow=nbSteps, ncol=6)
@@ -215,5 +215,6 @@ z[,5] <- res$bond[,iScenario]
 z[,6] <- res$portfolio[,iScenario]
 colnames(z) <- c("time", "stock price", "delta", "option", "bond pos", "hedge port.")
 xt <- xtable(z, label=paste('tab:sim-',iScenario,sep=''), caption='Delta hedging simulation')
+digits(xt) = dec.digits
 xt
 }
